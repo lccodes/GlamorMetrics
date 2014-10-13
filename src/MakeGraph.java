@@ -4,12 +4,16 @@ import java.util.Map;
 //Class that contains all markov chain + graph functions
 //that work on FF data files
 public class MakeGraph{
-	/* Set where the file is */
-	static String where;
+	/* Set where the master-path file is */
+	static String masterPath;
+	static String funPath;
+	static String surveyPath;
+	static String viewsPath;
 
 
 	/*
 	 * Generates the HashMap of HashMaps that tell the probability of one bin to the next
+	 * this is for the Discrete Markov Process visualization
 	 */
 	public void collectiveGraph(){
 		System.out.println("Starting...\n");
@@ -25,10 +29,10 @@ public class MakeGraph{
 			theMap.put(b, temp);
 		}
 		// ******************************
-		//Start the algo
+		//Start the algorithm
 		BufferedReader br;
 		try {
-			br = new BufferedReader(new FileReader(where));
+			br = new BufferedReader(new FileReader(masterPath));
 
 			String next = br.readLine();
 			while(next != null){
@@ -170,20 +174,55 @@ public class MakeGraph{
 			e.printStackTrace();
 		}
 	}
+	
+	/*
+	 * Generates the master dataset for Stata and other analysis
+	 */
+public void genMaster(){
+	//PART 1: Read all the data sets
+	BufferedReader br;
+	try {
+		br = new BufferedReader(new FileReader(masterPath));
+	//1.1: Read the master path file for weekly engagement metrics
+		
+	//1.2: Read the survey file for survey data
+		
+	//1.3: Read the fun file for fun data
+		
+	//1.4: Read the views file for macro engagement data and weekly view data
+		
+	//Close up shop
+		br.close();
+	}catch(IOException e){
+		System.out.println("Nonspecified error reading the file, see trace:\n");
+		System.out.println(e);
+	}
+	
+}
 
 	/*
-	 * Entry point to the function and directs the action
+	 * Entry point to the program and directs the action
 	 */
 	public static void main(String[] args){
 		MakeGraph mg = new MakeGraph();
 		if(args.length < 2){
-			System.out.println("Usage: <file> <type>");
-		}else if(args[1].equals("collective")){
+			System.out.println("Usage: <type> <master-path> [survey-path] [fun-path] [views-path]");
+		}else if(args[0].equals("collective")){
 			System.out.println("Generating the collective graph...\n");
 			//Set the file
-			where = args[0];
+			masterPath = args[1];
 			mg.collectiveGraph();
 			System.out.println("Completed!\n");
+		}else if(args[0].equals("master") && args.length == 5){
+			System.out.println("Generating the master spreadsheet...");
+			masterPath = args[1];
+			surveyPath = args[2];
+			funPath = args[3];
+			viewsPath = args[4];
+			mg.genMaster();
+			System.out.println("Completed Full Spreadsheet");
+		}else if(args[0].equals("master")){
+			System.out.println("You need to include: <master-path> [survey-path] [fun-path] [views-path]");
 		}
 	}
 }

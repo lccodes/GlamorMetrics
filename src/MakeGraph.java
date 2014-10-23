@@ -1,4 +1,6 @@
 import java.io.*;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.HashMap;
 import java.util.Map;
 //Class that contains all markov chain + graph functions
@@ -10,7 +12,158 @@ public class MakeGraph{
 	static String surveyPath;
 	static String viewsPath;
 
-
+	/*
+	 * Creates the CSV with engagement metrics
+	 * 	1. Total time spent by week
+	 * 	2. Number of sessions per week
+	 * 	3. Number of days played per week
+	 */
+	public void engagementMetrics(){
+		System.out.println("Start!");
+		BufferedReader br;
+		BufferedWriter bw;
+		try {
+			br = new BufferedReader(new FileReader(masterPath));
+			bw = new BufferedWriter(new FileWriter("engagement.txt"));
+			bw.write("id,week,daydperweek,sessionsperweek");
+			String next = br.readLine();
+			while(next != null){
+				String last = "";
+				//Gets the id and the data
+				while(next.startsWith("&")){
+					last = next;
+					next = br.readLine();
+					if(next == null){
+						break;
+					}
+				}
+				if(next != null && last != ""){	
+					//Splits the data
+					String[] parts = next.split(",2014-");
+					//Get their username without &
+					last = last.substring(1);
+					Set<Integer> week1 = new HashSet<Integer>();
+					Set<Integer> week2 = new HashSet<Integer>();
+					Set<Integer> week3 = new HashSet<Integer>();
+					Set<Integer> week4 = new HashSet<Integer>();
+					Set<Integer> week5 = new HashSet<Integer>();
+					Set<Integer> week6 = new HashSet<Integer>();
+					Set<Integer> week7 = new HashSet<Integer>();
+					Set<Integer> week8 = new HashSet<Integer>();
+					
+					int sessions1 = 0;
+					int sessions2 = 0;
+					int sessions3 = 0;
+					int sessions4 = 0;
+					int sessions5 = 0;
+					int sessions6 = 0;
+					int sessions7 = 0;
+					int sessions8 = 0;
+					//Months are not the same length and that is rough
+					int lastDay = -1;
+					int firstHour = -1;
+					for(int i =1; i< parts.length; i++){
+						//System.out.println(Integer.parseInt(parts[i].substring(0,2)));
+						int theMonth = Integer.parseInt(parts[i].substring(0,2));
+						float theDay = Integer.parseInt(parts[i].substring(3,5));
+						int hour = Integer.parseInt(parts[i].substring(6,8));
+						//I need a longterm solution
+						if(theMonth == 9 && theDay <= 7 && theDay > 0){
+							week1.add((int)theDay);
+							if(lastDay == theDay){
+								if(firstHour > hour+1){
+									sessions1++;
+								}
+							}else{
+								firstHour = hour;
+							}
+						}else if(theMonth == 9 && theDay <= 14 && theDay > 7){
+							week2.add((int)theDay);
+							if(lastDay == theDay){
+								if(firstHour > hour+1){
+									sessions2++;
+								}
+							}else{
+								firstHour = hour;
+							}
+						}else if(theMonth == 9 && theDay <= 21 && theDay > 14){
+							week3.add((int)theDay);
+							if(lastDay == theDay){
+								if(firstHour > hour+1){
+									sessions3++;
+								}
+							}else{
+								firstHour = hour;
+							}
+						}else if(theMonth == 9 && theDay <= 28 && theDay > 21){
+							week4.add((int)theDay);
+							if(lastDay == theDay){
+								if(firstHour > hour+1){
+									sessions4++;
+								}
+							}else{
+								firstHour = hour;
+							}
+						}else if((theMonth == 9 && theDay > 28) || (theMonth == 10 && theDay <= 4)){
+							week5.add((int)theDay);
+							if(lastDay == theDay){
+								if(firstHour > hour+1){
+									sessions5++;
+								}
+							}else{
+								firstHour = hour;
+							}
+						}else if(theMonth == 10 && theDay <= 11 && theDay > 4){
+							week6.add((int)theDay);
+							if(lastDay == theDay){
+								if(firstHour > hour+1){
+									sessions6++;
+								}
+							}else{
+								firstHour = hour;
+							}
+						}else if(theMonth == 9 && theDay <= 18 && theDay > 11){
+							week7.add((int)theDay);
+							if(lastDay == theDay){
+								if(firstHour > hour+1){
+									sessions7++;
+								}
+							}else{
+								firstHour = hour;
+							}
+						}else if(theMonth == 10 && theDay > 18){
+							week8.add((int)theDay);
+							if(lastDay == theDay){
+								if(firstHour > hour+1){
+									sessions8++;
+								}
+							}else{
+								firstHour = hour;
+							}
+						}
+						
+						lastDay = (int)theDay;
+					}
+					bw.write(last+",1,"+week1.size()+","+sessions1+"\n"+
+							 last+",2,"+week2.size()+","+sessions2+"\n"+
+							 last+",3,"+week3.size()+","+sessions3+"\n"+
+							 last+",4,"+week4.size()+","+sessions4+"\n"+
+							 last+",5,"+week5.size()+","+sessions5+"\n"+
+							 last+",6,"+week6.size()+","+sessions6+"\n"+
+							 last+",7,"+week7.size()+","+sessions7+"\n"+
+							 last+",8,"+week8.size()+","+sessions8+"\n");
+				}
+				next = br.readLine();
+			}
+			
+			bw.flush();
+			br.close();
+			bw.close();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+	}
+	
 	/*
 	 * Generates the HashMap of HashMaps that tell the probability of one bin to the next
 	 * this is for the Discrete Markov Process visualization
@@ -212,7 +365,7 @@ public void genMaster(){
 			//Set the file
 			masterPath = args[1];
 			mg.collectiveGraph();
-			System.out.println("Completed!\n");
+			System.out.println("Completed!");
 		}else if(args[0].equals("master") && args.length == 5){
 			System.out.println("Generating the master spreadsheet...");
 			masterPath = args[1];
@@ -221,8 +374,14 @@ public void genMaster(){
 			viewsPath = args[4];
 			mg.genMaster();
 			System.out.println("Completed Full Spreadsheet");
+		}else if(args[0].equals("engagement") && args.length == 2){
+			masterPath = args[1];
+			mg.engagementMetrics();
+			System.out.println("Completed!");
 		}else if(args[0].equals("master")){
 			System.out.println("You need to include: <master-path> [survey-path] [fun-path] [views-path]");
+		}else{
+			System.out.println("Usage: <type> <master-path> [survey-path] [fun-path] [views-path]");
 		}
 	}
 }

@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.HashMap;
@@ -11,6 +12,10 @@ public class MakeGraph{
 	static String funPath;
 	static String surveyPath;
 	static String viewsPath;
+	/* Let's us customize which week we're at in one place */
+	final int WEEK = 8;
+	/* Toggle this to get additional information */
+	final boolean PRINT = false;
 
 	/*
 	 * Creates the CSV with engagement metrics
@@ -25,7 +30,8 @@ public class MakeGraph{
 		try {
 			br = new BufferedReader(new FileReader(masterPath));
 			bw = new BufferedWriter(new FileWriter("engagement.txt"));
-			bw.write("id,week,daydperweek,sessionsperweek");
+			//Header for CSV file
+			bw.write("id,week,daydperweek,sessionsperweek\n");
 			String next = br.readLine();
 			while(next != null){
 				String last = "";
@@ -42,23 +48,15 @@ public class MakeGraph{
 					String[] parts = next.split(",2014-");
 					//Get their username without &
 					last = last.substring(1);
-					Set<Integer> week1 = new HashSet<Integer>();
-					Set<Integer> week2 = new HashSet<Integer>();
-					Set<Integer> week3 = new HashSet<Integer>();
-					Set<Integer> week4 = new HashSet<Integer>();
-					Set<Integer> week5 = new HashSet<Integer>();
-					Set<Integer> week6 = new HashSet<Integer>();
-					Set<Integer> week7 = new HashSet<Integer>();
-					Set<Integer> week8 = new HashSet<Integer>();
+					//Create week bins
+					//Initialize to avoid out of bounds errors
+					ArrayList<Set<Integer>> weeks = new ArrayList<Set<Integer>>(WEEK);
+					for(int i =0; i < WEEK; i++){
+						weeks.add(new HashSet<Integer>());
+					}
 					
-					int sessions1 = 0;
-					int sessions2 = 0;
-					int sessions3 = 0;
-					int sessions4 = 0;
-					int sessions5 = 0;
-					int sessions6 = 0;
-					int sessions7 = 0;
-					int sessions8 = 0;
+					//Sessions array
+					int[] sess = new int[WEEK];
 					//Months are not the same length and that is rough
 					int lastDay = -1;
 					int firstHour = -1;
@@ -69,73 +67,73 @@ public class MakeGraph{
 						int hour = Integer.parseInt(parts[i].substring(6,8));
 						//I need a longterm solution
 						if(theMonth == 9 && theDay <= 7 && theDay > 0){
-							week1.add((int)theDay);
+							weeks.get(0).add((int)theDay);
 							if(lastDay == theDay){
 								if(firstHour > hour+1){
-									sessions1++;
+									sess[0]++;
 								}
 							}else{
 								firstHour = hour;
 							}
 						}else if(theMonth == 9 && theDay <= 14 && theDay > 7){
-							week2.add((int)theDay);
+							weeks.get(1).add((int)theDay);
 							if(lastDay == theDay){
 								if(firstHour > hour+1){
-									sessions2++;
+									sess[1]++;
 								}
 							}else{
 								firstHour = hour;
 							}
 						}else if(theMonth == 9 && theDay <= 21 && theDay > 14){
-							week3.add((int)theDay);
+							weeks.get(2).add((int)theDay);
 							if(lastDay == theDay){
 								if(firstHour > hour+1){
-									sessions3++;
+									sess[2]++;
 								}
 							}else{
 								firstHour = hour;
 							}
 						}else if(theMonth == 9 && theDay <= 28 && theDay > 21){
-							week4.add((int)theDay);
+							weeks.get(3).add((int)theDay);
 							if(lastDay == theDay){
 								if(firstHour > hour+1){
-									sessions4++;
+									sess[3]++;
 								}
 							}else{
 								firstHour = hour;
 							}
 						}else if((theMonth == 9 && theDay > 28) || (theMonth == 10 && theDay <= 4)){
-							week5.add((int)theDay);
+							weeks.get(4).add((int)theDay);
 							if(lastDay == theDay){
 								if(firstHour > hour+1){
-									sessions5++;
+									sess[4]++;
 								}
 							}else{
 								firstHour = hour;
 							}
 						}else if(theMonth == 10 && theDay <= 11 && theDay > 4){
-							week6.add((int)theDay);
+							weeks.get(5).add((int)theDay);
 							if(lastDay == theDay){
 								if(firstHour > hour+1){
-									sessions6++;
+									sess[5]++;
 								}
 							}else{
 								firstHour = hour;
 							}
 						}else if(theMonth == 9 && theDay <= 18 && theDay > 11){
-							week7.add((int)theDay);
+							weeks.get(6).add((int)theDay);
 							if(lastDay == theDay){
 								if(firstHour > hour+1){
-									sessions7++;
+									sess[6]++;
 								}
 							}else{
 								firstHour = hour;
 							}
 						}else if(theMonth == 10 && theDay > 18){
-							week8.add((int)theDay);
+							weeks.get(7).add((int)theDay);
 							if(lastDay == theDay){
 								if(firstHour > hour+1){
-									sessions8++;
+									sess[7]++;
 								}
 							}else{
 								firstHour = hour;
@@ -144,18 +142,31 @@ public class MakeGraph{
 						
 						lastDay = (int)theDay;
 					}
-					bw.write(last+",1,"+week1.size()+","+sessions1+"\n"+
-							 last+",2,"+week2.size()+","+sessions2+"\n"+
-							 last+",3,"+week3.size()+","+sessions3+"\n"+
-							 last+",4,"+week4.size()+","+sessions4+"\n"+
-							 last+",5,"+week5.size()+","+sessions5+"\n"+
-							 last+",6,"+week6.size()+","+sessions6+"\n"+
-							 last+",7,"+week7.size()+","+sessions7+"\n"+
-							 last+",8,"+week8.size()+","+sessions8+"\n");
+					//Printable
+					//adds 1 to all sessions because the clock should start at 1 instead of 0
+					if(PRINT){
+						System.out.println(last+",1,"+weeks.get(0).size()+","+(sess[0]+1)+"\n"+
+								 last+",2,"+weeks.get(1).size()+","+(sess[1]+1)+"\n"+
+								 last+",3,"+weeks.get(2).size()+","+(sess[2]+1)+"\n"+
+								 last+",4,"+weeks.get(3).size()+","+(sess[3]+1)+"\n"+
+								 last+",5,"+weeks.get(4).size()+","+(sess[4]+1)+"\n"+
+								 last+",6,"+weeks.get(5).size()+","+(sess[5]+1)+"\n"+
+								 last+",7,"+weeks.get(6).size()+","+(sess[6]+1)+"\n"+
+								 last+",8,"+weeks.get(7).size()+","+(sess[7]+1)+"\n");
+					}
+					bw.write(last+",1,"+weeks.get(0).size()+","+(sess[0]+1)+"\n"+
+							 last+",2,"+weeks.get(1).size()+","+(sess[1]+1)+"\n"+
+							 last+",3,"+weeks.get(2).size()+","+(sess[2]+1)+"\n"+
+							 last+",4,"+weeks.get(3).size()+","+(sess[3]+1)+"\n"+
+							 last+",5,"+weeks.get(4).size()+","+(sess[4]+1)+"\n"+
+							 last+",6,"+weeks.get(5).size()+","+(sess[5]+1)+"\n"+
+							 last+",7,"+weeks.get(6).size()+","+(sess[6]+1)+"\n"+
+							 last+",8,"+weeks.get(7).size()+","+(sess[7]+1));
 				}
 				next = br.readLine();
 			}
 			
+			//Close streams and save it
 			bw.flush();
 			br.close();
 			bw.close();

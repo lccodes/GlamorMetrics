@@ -12,11 +12,27 @@ public class MakeGraph{
 	static String funPath;
 	static String surveyPath;
 	static String viewsPath;
-	/* Let's us customize which week we're at in one place */
-	final int WEEK = 8;
+	/* Lets us customize which week we're at in one place */
+	final int WEEK = 14;
 	/* Toggle this to get additional information */
 	final boolean PRINT = false;
 
+	/*
+	 * Weekly click data metrics
+	 */
+	public void clickData(){
+		System.out.println("Start!");
+		BufferedReader br;
+		BufferedWriter bw;
+		try {
+			br = new BufferedReader(new FileReader(viewsPath));
+			bw = new BufferedWriter(new FileWriter("clicks.txt"));
+			br.close();
+			bw.close();
+		}catch(IOException e){};
+		
+	}
+	
 	/*
 	 * Creates the CSV with engagement metrics
 	 * 	1. Total time spent by week
@@ -31,7 +47,7 @@ public class MakeGraph{
 			br = new BufferedReader(new FileReader(masterPath));
 			bw = new BufferedWriter(new FileWriter("engagement.txt"));
 			//Header for CSV file
-			bw.write("id,week,daydperweek,sessionsperweek\n");
+			bw.write("id,week,daysperweek,sessionsperweek,clicksperweek\n");
 			String next = br.readLine();
 			while(next != null){
 				String last = "";
@@ -56,87 +72,170 @@ public class MakeGraph{
 					}
 					
 					//Sessions array
+					//A session is any period of more than 30 minutes of inactivity 
 					int[] sess = new int[WEEK];
+					//All the clicks for each week
+					int[] clicks = new int[WEEK];
 					//Months are not the same length and that is rough
 					int lastDay = -1;
-					int firstHour = -1;
+					int firstMinute = -1;
 					for(int i =1; i< parts.length; i++){
-						//System.out.println(Integer.parseInt(parts[i].substring(0,2)));
+						//System.out.println(parts[i]);
 						int theMonth = Integer.parseInt(parts[i].substring(0,2));
 						float theDay = Integer.parseInt(parts[i].substring(3,5));
-						int hour = Integer.parseInt(parts[i].substring(6,8));
+						int minute = Integer.parseInt(parts[i].substring(9,11));
 						//I need a longterm solution
 						if(theMonth == 9 && theDay <= 7 && theDay > 0){
 							weeks.get(0).add((int)theDay);
+							clicks[0]++;
 							if(lastDay == theDay){
-								if(firstHour > hour+1){
+								if(firstMinute > minute+30){
 									sess[0]++;
 								}
 							}else{
-								firstHour = hour;
+								firstMinute = minute;
 							}
 						}else if(theMonth == 9 && theDay <= 14 && theDay > 7){
 							weeks.get(1).add((int)theDay);
+							clicks[1]++;
 							if(lastDay == theDay){
-								if(firstHour > hour+1){
+								if(firstMinute > minute+30){
 									sess[1]++;
 								}
 							}else{
-								firstHour = hour;
+								firstMinute = minute;
 							}
 						}else if(theMonth == 9 && theDay <= 21 && theDay > 14){
 							weeks.get(2).add((int)theDay);
+							clicks[2]++;
 							if(lastDay == theDay){
-								if(firstHour > hour+1){
+								if(firstMinute > minute+30){
 									sess[2]++;
 								}
 							}else{
-								firstHour = hour;
+								firstMinute = minute;
 							}
 						}else if(theMonth == 9 && theDay <= 28 && theDay > 21){
 							weeks.get(3).add((int)theDay);
+							clicks[3]++;
 							if(lastDay == theDay){
-								if(firstHour > hour+1){
+								if(firstMinute > minute+30){
 									sess[3]++;
 								}
 							}else{
-								firstHour = hour;
+								firstMinute = minute;
 							}
 						}else if((theMonth == 9 && theDay > 28) || (theMonth == 10 && theDay <= 4)){
 							weeks.get(4).add((int)theDay);
+							clicks[4]++;
 							if(lastDay == theDay){
-								if(firstHour > hour+1){
+								if(firstMinute > minute+30){
 									sess[4]++;
 								}
 							}else{
-								firstHour = hour;
+								firstMinute = minute;
 							}
 						}else if(theMonth == 10 && theDay <= 11 && theDay > 4){
 							weeks.get(5).add((int)theDay);
+							clicks[5]++;
 							if(lastDay == theDay){
-								if(firstHour > hour+1){
+								if(firstMinute > minute+30){
 									sess[5]++;
 								}
 							}else{
-								firstHour = hour;
+								firstMinute = minute;
 							}
 						}else if(theMonth == 9 && theDay <= 18 && theDay > 11){
 							weeks.get(6).add((int)theDay);
+							clicks[6]++;
 							if(lastDay == theDay){
-								if(firstHour > hour+1){
+								if(firstMinute > minute+30){
 									sess[6]++;
 								}
 							}else{
-								firstHour = hour;
+								firstMinute = minute;
 							}
-						}else if(theMonth == 10 && theDay > 18){
+						}else if(theMonth == 10 && theDay <= 25 && theDay > 18){
 							weeks.get(7).add((int)theDay);
+							clicks[7]++;
 							if(lastDay == theDay){
-								if(firstHour > hour+1){
+								if(firstMinute > minute+30){
 									sess[7]++;
 								}
 							}else{
-								firstHour = hour;
+								firstMinute = minute;
+							}
+						}else if((theMonth == 10 && theDay <= 31 && theDay > 25) ||
+								(theMonth == 11 && theDay == 1)){
+							weeks.get(8).add((int)theDay);
+							clicks[8]++;
+							if(lastDay == theDay){
+								if(firstMinute > minute+30){
+									sess[8]++;
+								}
+							}else{
+								firstMinute = minute;
+							}
+						}else if(theMonth == 11 && theDay <= 8 && theDay > 1){
+							weeks.get(9).add((int)theDay);
+							clicks[9]++;
+							if(lastDay == theDay){
+								if(firstMinute > minute+30){
+									sess[9]++;
+								}
+							}else{
+								firstMinute = minute;
+							}
+						}else if(theMonth == 11 && theDay <= 15 && theDay > 8){
+							weeks.get(10).add((int)theDay);
+							clicks[10]++;
+							if(lastDay == theDay){
+								if(firstMinute > minute+30){
+									sess[10]++;
+								}
+							}else{
+								firstMinute = minute;
+							}
+						}else if(theMonth == 11 && theDay <= 22 && theDay > 15){
+							weeks.get(10).add((int)theDay);
+							clicks[10]++;
+							if(lastDay == theDay){
+								if(firstMinute > minute+30){
+									sess[10]++;
+								}
+							}else{
+								firstMinute = minute;
+							}
+						}else if(theMonth == 11 && theDay <= 29 && theDay > 22){
+							weeks.get(11).add((int)theDay);
+							clicks[11]++;
+							if(lastDay == theDay){
+								if(firstMinute > minute+30){
+									sess[11]++;
+								}
+							}else{
+								firstMinute = minute;
+							}
+						}else if((theMonth == 11 && theDay == 30) || 
+								(theMonth == 12 && theDay <= 6)){
+							weeks.get(12).add((int)theDay);
+							clicks[12]++;
+							if(lastDay == theDay){
+								if(firstMinute > minute+30){
+									sess[12]++;
+								}
+							}else{
+								firstMinute = minute;
+							}
+						}else if(theMonth == 12 && theDay <= 13 && theDay > 6){
+							weeks.get(13).add((int)theDay);
+							clicks[13]++;
+							if(lastDay == theDay){
+								if(firstMinute > minute+30){
+									sess[13]++;
+								}
+							}else{
+								firstMinute = minute;
 							}
 						}
 						
@@ -144,24 +243,25 @@ public class MakeGraph{
 					}
 					//Printable
 					//adds 1 to all sessions because the clock should start at 1 instead of 0
+					//TODO: We should be two for loops
 					if(PRINT){
-						System.out.println(last+",1,"+weeks.get(0).size()+","+(sess[0]+1)+"\n"+
-								 last+",2,"+weeks.get(1).size()+","+(sess[1]+1)+"\n"+
-								 last+",3,"+weeks.get(2).size()+","+(sess[2]+1)+"\n"+
-								 last+",4,"+weeks.get(3).size()+","+(sess[3]+1)+"\n"+
-								 last+",5,"+weeks.get(4).size()+","+(sess[4]+1)+"\n"+
-								 last+",6,"+weeks.get(5).size()+","+(sess[5]+1)+"\n"+
-								 last+",7,"+weeks.get(6).size()+","+(sess[6]+1)+"\n"+
-								 last+",8,"+weeks.get(7).size()+","+(sess[7]+1)+"\n");
+						System.out.println(last+",1,"+weeks.get(0).size()+","+(sess[0]+1)+","+clicks[0]+"\n"+
+								 last+",2,"+weeks.get(1).size()+","+(sess[1]+1)+","+clicks[1]+"\n"+
+								 last+",3,"+weeks.get(2).size()+","+(sess[2]+1)+","+clicks[2]+"\n"+
+								 last+",4,"+weeks.get(3).size()+","+(sess[3]+1)+","+clicks[3]+"\n"+
+								 last+",5,"+weeks.get(4).size()+","+(sess[4]+1)+","+clicks[4]+"\n"+
+								 last+",6,"+weeks.get(5).size()+","+(sess[5]+1)+","+clicks[5]+"\n"+
+								 last+",7,"+weeks.get(6).size()+","+(sess[6]+1)+","+clicks[6]+"\n"+
+								 last+",8,"+weeks.get(7).size()+","+(sess[7]+1)+","+clicks[7]+"\n");
 					}
-					bw.write(last+",1,"+weeks.get(0).size()+","+(sess[0]+1)+"\n"+
-							 last+",2,"+weeks.get(1).size()+","+(sess[1]+1)+"\n"+
-							 last+",3,"+weeks.get(2).size()+","+(sess[2]+1)+"\n"+
-							 last+",4,"+weeks.get(3).size()+","+(sess[3]+1)+"\n"+
-							 last+",5,"+weeks.get(4).size()+","+(sess[4]+1)+"\n"+
-							 last+",6,"+weeks.get(5).size()+","+(sess[5]+1)+"\n"+
-							 last+",7,"+weeks.get(6).size()+","+(sess[6]+1)+"\n"+
-							 last+",8,"+weeks.get(7).size()+","+(sess[7]+1));
+					bw.write(last+",1,"+weeks.get(0).size()+","+(sess[0]+1)+","+clicks[0]+"\n"+
+							 last+",2,"+weeks.get(1).size()+","+(sess[1]+1)+","+clicks[1]+"\n"+
+							 last+",3,"+weeks.get(2).size()+","+(sess[2]+1)+","+clicks[2]+"\n"+
+							 last+",4,"+weeks.get(3).size()+","+(sess[3]+1)+","+clicks[3]+"\n"+
+							 last+",5,"+weeks.get(4).size()+","+(sess[4]+1)+","+clicks[4]+"\n"+
+							 last+",6,"+weeks.get(5).size()+","+(sess[5]+1)+","+clicks[5]+"\n"+
+							 last+",7,"+weeks.get(6).size()+","+(sess[6]+1)+","+clicks[6]+"\n"+
+							 last+",8,"+weeks.get(7).size()+","+(sess[7]+1)+","+clicks[7]+"\n");
 				}
 				next = br.readLine();
 			}
@@ -202,7 +302,7 @@ public class MakeGraph{
 			while(next != null){
 				//See each line:
 				//System.out.println(next);
-				String[] parts = next.split("[,\\||]");
+				String[] parts = next.split("(,2014)|[|]");
 				//Goes through all the actions in each line
 				int len = parts.length;
 				for(int i = 0; i < len;i+=3){
@@ -220,7 +320,7 @@ public class MakeGraph{
 					}
 					//I test for extra commas; uncomment to use
 					if(len > i+4){
-					//System.out.println("--"+parts[i+1]+"<<>>"+parts[i+4]);
+						System.out.println("--"+parts[i+1]+"<<>>"+parts[i+4]);
 					}
 					//If it switches dates then we exit
 					if(len < i+4 || !parts[i+1].substring(0,12).equals(parts[i+4].substring(0,12))||
@@ -371,7 +471,7 @@ public void genMaster(){
 		MakeGraph mg = new MakeGraph();
 		if(args.length < 2){
 			System.out.println("Usage: <type> <master-path> [survey-path] [fun-path] [views-path]");
-		}else if(args[0].equals("collective")){
+		}else if(args[0].equals("collective") && args.length >= 2){
 			System.out.println("Generating the collective graph...\n");
 			//Set the file
 			masterPath = args[1];
@@ -388,6 +488,7 @@ public void genMaster(){
 		}else if(args[0].equals("engagement") && args.length == 2){
 			masterPath = args[1];
 			mg.engagementMetrics();
+			
 			System.out.println("Completed!");
 		}else if(args[0].equals("master")){
 			System.out.println("You need to include: <master-path> [survey-path] [fun-path] [views-path]");
